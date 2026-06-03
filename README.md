@@ -8,7 +8,7 @@ The app is intentionally not a generic "chat with PDFs" wrapper. The core model 
 hearing -> agenda item -> case/project -> supporting documents -> pages/chunks/evidence
 ```
 
-Milestone 4 implements the repository scaffold, DuckDB initialization, the official CPC hearing archive crawler, supporting-page document discovery, idempotent PDF downloads, PDF text extraction, agenda item parsing, structure-aware chunking, embeddings, and hybrid search.
+Milestone 5 implements the local-first MVP: DuckDB initialization, CPC crawling, supporting-document discovery, idempotent PDF downloads, PDF text extraction, agenda item parsing, structure-aware chunking, embeddings, hybrid search, FastAPI routes, and a Next.js frontend.
 
 ## Setup
 
@@ -17,7 +17,7 @@ uv sync
 uv run planlens init-db
 ```
 
-## Milestone 4 CLI
+## Milestone 5 CLI
 
 Initialize the local database:
 
@@ -77,6 +77,22 @@ uv run planlens search "parking opposition near transit"
 
 Use `--lexical-only` to debug keyword ranking without embedding the query.
 
+Run the API:
+
+```bash
+uv run planlens serve-api
+```
+
+Run the frontend in another terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Then open `http://localhost:3000`.
+
 ## Embeddings
 
 The default provider is `local_hash`, an offline deterministic embedding baseline that keeps the MVP runnable without API keys. It is useful for development and hybrid lexical/vector ranking, but it is intentionally swappable.
@@ -127,9 +143,16 @@ Run linting:
 uv run ruff check
 ```
 
+Build the frontend:
+
+```bash
+cd frontend
+npm run build
+```
+
 ## Current Limitations
 
-Milestone 4 stores hearing metadata, source document PDF metadata, extracted page text, parsed agenda items, simple case-number document links, chunks, and embeddings. API routes and the frontend are intentionally left for later milestones.
+Milestone 5 is an MVP. It returns cited retrieval evidence, but LLM answer generation, hosted deployment, auth, historical backfill, OCR fallback, advanced maps, and polished production analytics are intentionally deferred.
 
 ## Roadmap
 

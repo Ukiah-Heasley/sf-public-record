@@ -339,5 +339,25 @@ def search_command(
         typer.echo(_snippet(result.text))
 
 
+@app.command("serve-api")
+def serve_api_command(
+    host: Annotated[str, typer.Option(help="API host.")] = "127.0.0.1",
+    port: Annotated[int, typer.Option(min=1, max=65535, help="API port.")] = 8000,
+    reload: Annotated[
+        bool,
+        typer.Option(help="Reload API server when backend files change."),
+    ] = False,
+) -> None:
+    """Run the local FastAPI application."""
+    import uvicorn
+
+    uvicorn.run(
+        "backend.planlens.api.main:app",
+        host=host,
+        port=port,
+        reload=reload,
+    )
+
+
 if __name__ == "__main__":
     app()
