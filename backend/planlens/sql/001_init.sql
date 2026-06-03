@@ -23,3 +23,46 @@ CREATE TABLE IF NOT EXISTS source_documents (
     downloaded_at TIMESTAMP,
     FOREIGN KEY (hearing_id) REFERENCES hearings(hearing_id)
 );
+
+CREATE TABLE IF NOT EXISTS pages (
+    page_id VARCHAR PRIMARY KEY,
+    document_id VARCHAR NOT NULL,
+    page_number INTEGER NOT NULL,
+    text TEXT,
+    char_count INTEGER,
+    extraction_method VARCHAR,
+    extraction_quality VARCHAR,
+    FOREIGN KEY (document_id) REFERENCES source_documents(document_id)
+);
+
+CREATE TABLE IF NOT EXISTS agenda_items (
+    agenda_item_id VARCHAR PRIMARY KEY,
+    hearing_id VARCHAR NOT NULL,
+    item_number VARCHAR,
+    section VARCHAR,
+    case_number VARCHAR,
+    case_suffix VARCHAR,
+    address VARCHAR,
+    district VARCHAR,
+    planner_name VARCHAR,
+    planner_contact VARCHAR,
+    project_description TEXT,
+    entitlement_type VARCHAR,
+    ceqa_status VARCHAR,
+    preliminary_recommendation VARCHAR,
+    continued_from VARCHAR,
+    proposed_continuance_date DATE,
+    raw_text TEXT,
+    parser_confidence DOUBLE,
+    FOREIGN KEY (hearing_id) REFERENCES hearings(hearing_id)
+);
+
+CREATE TABLE IF NOT EXISTS document_links (
+    link_id VARCHAR PRIMARY KEY,
+    agenda_item_id VARCHAR,
+    document_id VARCHAR,
+    relationship VARCHAR,
+    confidence DOUBLE,
+    FOREIGN KEY (agenda_item_id) REFERENCES agenda_items(agenda_item_id),
+    FOREIGN KEY (document_id) REFERENCES source_documents(document_id)
+);
