@@ -8,7 +8,7 @@ The app is intentionally not a generic "chat with PDFs" wrapper. The core model 
 hearing -> agenda item -> case/project -> supporting documents -> pages/chunks/evidence
 ```
 
-Milestone 3 implements the repository scaffold, DuckDB initialization, the official CPC hearing archive crawler, supporting-page document discovery, idempotent PDF downloads, PDF text extraction, and agenda item parsing.
+Milestone 4 implements the repository scaffold, DuckDB initialization, the official CPC hearing archive crawler, supporting-page document discovery, idempotent PDF downloads, PDF text extraction, agenda item parsing, structure-aware chunking, embeddings, and hybrid search.
 
 ## Setup
 
@@ -17,7 +17,7 @@ uv sync
 uv run planlens init-db
 ```
 
-## Milestone 3 CLI
+## Milestone 4 CLI
 
 Initialize the local database:
 
@@ -57,6 +57,48 @@ Parse agenda items from extracted agenda pages and link supporting documents whe
 uv run planlens parse-agendas
 ```
 
+Create deterministic, citation-preserving chunks:
+
+```bash
+uv run planlens chunk
+```
+
+Embed chunks with the configured provider:
+
+```bash
+uv run planlens embed
+```
+
+Search indexed evidence:
+
+```bash
+uv run planlens search "parking opposition near transit"
+```
+
+Use `--lexical-only` to debug keyword ranking without embedding the query.
+
+## Embeddings
+
+The default provider is `local_hash`, an offline deterministic embedding baseline that keeps the MVP runnable without API keys. It is useful for development and hybrid lexical/vector ranking, but it is intentionally swappable.
+
+```bash
+PLANLENS_EMBEDDING_PROVIDER=local_hash
+PLANLENS_EMBEDDING_MODEL=local-hash-v1
+PLANLENS_EMBEDDING_DIMENSIONS=384
+```
+
+Future/higher-quality providers can be configured without changing the database shape:
+
+```bash
+PLANLENS_EMBEDDING_PROVIDER=openai
+PLANLENS_EMBEDDING_MODEL=text-embedding-3-small
+OPENAI_API_KEY=...
+
+PLANLENS_EMBEDDING_PROVIDER=google
+PLANLENS_EMBEDDING_MODEL=gemini-embedding-001
+GOOGLE_API_KEY=...
+```
+
 ## Data Directory
 
 ```text
@@ -87,7 +129,7 @@ uv run ruff check
 
 ## Current Limitations
 
-Milestone 3 stores hearing metadata, source document PDF metadata, extracted page text, parsed agenda items, and simple case-number document links. Chunking, embeddings, search, API routes, and the frontend are intentionally left for later milestones.
+Milestone 4 stores hearing metadata, source document PDF metadata, extracted page text, parsed agenda items, simple case-number document links, chunks, and embeddings. API routes and the frontend are intentionally left for later milestones.
 
 ## Roadmap
 

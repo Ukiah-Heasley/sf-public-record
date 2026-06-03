@@ -11,8 +11,11 @@ from .crawl.cpc_archive import ARCHIVE_URL, crawl_archive
 from .crawl.downloader import download_pdfs
 from .crawl.supporting_pages import crawl_supporting_pages
 from .db import init_db
+from .embed.embeddings import embed_chunks
 from .parse.agenda_parser import parse_agendas
+from .parse.chunker import chunk_documents
 from .parse.pdf_text import parse_pdfs
+from .search.hybrid import hybrid_search, lexical_search
 
 app = typer.Typer(no_args_is_help=True, help="PlanLens SF local pipeline commands.")
 
@@ -24,6 +27,19 @@ def _parse_date(value: str | None) -> date | None:
         return date.fromisoformat(value)
     except ValueError as exc:
         raise typer.BadParameter("Use YYYY-MM-DD format.") from exc
+
+
+def _parse_csv(value: str | None) -> list[str] | None:
+    if not value:
+        return None
+    return [part.strip() for part in value.split(",") if part.strip()]
+
+
+def _snippet(text: str, limit: int = 260) -> str:
+    compact = " ".join(text.split())
+    if len(compact) <= limit:
+        return compact
+    return f"{compact[: limit - 3].rstrip()}..."
 
 
 @app.command("init-db")
@@ -196,6 +212,131 @@ def parse_agendas_command(
     typer.echo(f"Parsed agenda documents: {result.parsed_document_count}")
     typer.echo(f"Extracted agenda items: {result.agenda_item_count}")
     typer.echo(f"Linked supporting documents: {result.linked_document_count}")
+
+
+@app.command("chunk")
+def chunk_command(
+    limit: Annotated[
+        int | None,
+        typer.Option(min=1, help="Maximum parsed documents to chunk."),
+    ] = None,
+    document_id: Annotated[
+        str | None,
+        typer.Option(help="Only chunk one source document ID."),
+    ] = None,
+    db_path: Annotated[Path | None, typer.Option(help="DuckDB database path.")] = None,
+) -> None:
+    """Create deterministic search chunks from extracted page text."""
+    settings = Settings.from_env()
+    target = db_path or settings.db_path
+    init_db(target)
+
+    result = chunk_documents(
+        db_path=target,
+        settings=settings,
+        limit=limit,
+        document_id=document_id,
+    )
+
+    typer.echo(f"Parsed documents considered: {result.document_count}")
+    typer.echo(f"Chunks written: {result.chunk_count}")
+
+
+@app.command("embed")
+def embed_command(
+    batch_size: Annotated[
+        int,
+        typer.Option(min=1, help="Embedding batch size."),
+    ] = 32,
+    limit: Annotated[
+        int | None,
+        typer.Option(min=1, help="Maximum chunks to embed."),
+    ] = None,
+    force: Annotated[
+        bool,
+        typer.Option(help="Recompute embeddings for the configured provider/model."),
+    ] = False,
+    db_path: Annotated[Path | None, typer.Option(help="DuckDB database path.")] = None,
+) -> None:
+    """Embed chunks with the configured embedding provider."""
+    settings = Settings.from_env()
+    target = db_path or settings.db_path
+    init_db(target)
+
+    result = embed_chunks(
+        db_path=target,
+        settings=settings,
+        batch_size=batch_size,
+        limit=limit,
+        force=force,
+    )
+
+    typer.echo(f"Embedding provider: {result.embedding_provider}")
+    typer.echo(f"Embedding model: {result.embedding_model}")
+    typer.echo(f"Embedding dimensions: {result.embedding_dim}")
+    typer.echo(f"Chunks available: {result.chunk_count}")
+    typer.echo(f"Chunks embedded: {result.embedded_count}")
+    typer.echo(f"Chunks skipped: {result.skipped_count}")
+
+
+@app.command("search")
+def search_command(
+    query: Annotated[str, typer.Argument(help="Search query.")],
+    limit: Annotated[int, typer.Option(min=1, help="Maximum results.")] = 10,
+    date_start: Annotated[
+        str | None,
+        typer.Option(help="Inclusive lower hearing date bound, YYYY-MM-DD."),
+    ] = None,
+    date_end: Annotated[
+        str | None,
+        typer.Option(help="Inclusive upper hearing date bound, YYYY-MM-DD."),
+    ] = None,
+    document_types: Annotated[
+        str | None,
+        typer.Option(help="Comma-separated source document types to include."),
+    ] = None,
+    lexical_only: Annotated[
+        bool,
+        typer.Option(help="Use lexical ranking only, without embedding the query."),
+    ] = False,
+    db_path: Annotated[Path | None, typer.Option(help="DuckDB database path.")] = None,
+) -> None:
+    """Search chunks with hybrid lexical/vector ranking."""
+    settings = Settings.from_env()
+    target = db_path or settings.db_path
+    init_db(target)
+
+    if lexical_only:
+        response = lexical_search(
+            db_path=target,
+            query=query,
+            date_start=_parse_date(date_start),
+            date_end=_parse_date(date_end),
+            document_types=_parse_csv(document_types),
+            limit=limit,
+        )
+    else:
+        response = hybrid_search(
+            db_path=target,
+            settings=settings,
+            query=query,
+            date_start=_parse_date(date_start),
+            date_end=_parse_date(date_end),
+            document_types=_parse_csv(document_types),
+            limit=limit,
+        )
+
+    typer.echo(f"Query: {response.query}")
+    typer.echo(response.answer_stub)
+    for index, result in enumerate(response.results, start=1):
+        typer.echo("")
+        typer.echo(
+            f"{index}. score={result.score:.4f} "
+            f"vector={result.vector_score:.4f} lexical={result.lexical_score:.4f}"
+        )
+        typer.echo(result.citation_label or result.chunk_id)
+        typer.echo(f"{result.title or result.source_type} - {result.url}")
+        typer.echo(_snippet(result.text))
 
 
 if __name__ == "__main__":

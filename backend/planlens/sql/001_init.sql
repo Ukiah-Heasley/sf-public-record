@@ -66,3 +66,27 @@ CREATE TABLE IF NOT EXISTS document_links (
     FOREIGN KEY (agenda_item_id) REFERENCES agenda_items(agenda_item_id),
     FOREIGN KEY (document_id) REFERENCES source_documents(document_id)
 );
+
+CREATE TABLE IF NOT EXISTS chunks (
+    chunk_id VARCHAR PRIMARY KEY,
+    document_id VARCHAR NOT NULL,
+    page_start INTEGER,
+    page_end INTEGER,
+    chunk_index INTEGER,
+    text TEXT NOT NULL,
+    token_estimate INTEGER,
+    section_hint VARCHAR,
+    citation_label VARCHAR,
+    FOREIGN KEY (document_id) REFERENCES source_documents(document_id)
+);
+
+CREATE TABLE IF NOT EXISTS chunk_embeddings (
+    chunk_id VARCHAR NOT NULL,
+    embedding_provider VARCHAR NOT NULL,
+    embedding_model VARCHAR NOT NULL,
+    embedding_dim INTEGER NOT NULL,
+    embedding FLOAT[],
+    embedded_at TIMESTAMP DEFAULT current_timestamp,
+    PRIMARY KEY (chunk_id, embedding_provider, embedding_model),
+    FOREIGN KEY (chunk_id) REFERENCES chunks(chunk_id)
+);

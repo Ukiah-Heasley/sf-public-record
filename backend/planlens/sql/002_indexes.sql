@@ -3,3 +3,8 @@ CREATE INDEX IF NOT EXISTS idx_documents_hearing ON source_documents(hearing_id)
 CREATE INDEX IF NOT EXISTS idx_pages_document ON pages(document_id);
 CREATE INDEX IF NOT EXISTS idx_agenda_hearing ON agenda_items(hearing_id);
 CREATE INDEX IF NOT EXISTS idx_agenda_case ON agenda_items(case_number);
+CREATE INDEX IF NOT EXISTS idx_chunks_document ON chunks(document_id);
+CREATE INDEX IF NOT EXISTS idx_embeddings_model ON chunk_embeddings(
+    embedding_provider,
+    embedding_model
+);
