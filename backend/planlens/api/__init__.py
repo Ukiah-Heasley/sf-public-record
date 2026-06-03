@@ -1,1 +1,1 @@
-"""FastAPI application for PlanLens."""
+"""FastAPI application for SF Public Record."""

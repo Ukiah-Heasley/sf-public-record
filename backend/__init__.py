@@ -1,1 +1,1 @@
-"""Backend package namespace for PlanLens SF."""
+"""Backend package namespace for SF Public Record."""

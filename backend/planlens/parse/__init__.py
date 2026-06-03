@@ -1,1 +1,1 @@
-"""Parsing helpers for local PlanLens source documents."""
+"""Parsing helpers for local SF Public Record source documents."""

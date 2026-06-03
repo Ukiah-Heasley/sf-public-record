@@ -17,7 +17,7 @@ from .parse.chunker import chunk_documents
 from .parse.pdf_text import parse_pdfs
 from .search.hybrid import hybrid_search, lexical_search
 
-app = typer.Typer(no_args_is_help=True, help="PlanLens SF local pipeline commands.")
+app = typer.Typer(no_args_is_help=True, help="SF Public Record local pipeline commands.")
 
 
 def _parse_date(value: str | None) -> date | None:

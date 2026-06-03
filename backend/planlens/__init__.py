@@ -1,4 +1,4 @@
-"""PlanLens SF backend package."""
+"""SF Public Record backend package."""
 
 __all__ = ["__version__"]
 

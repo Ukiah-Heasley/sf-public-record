@@ -12,8 +12,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="app-shell">
       <aside className="sidebar">
         <Link className="brand" href="/dashboard">
-          <span className="brand-mark">PL</span>
-          <span>PlanLens SF</span>
+          <span className="brand-mark">SF</span>
+          <span>SF Public Record</span>
         </Link>
         <nav className="nav" aria-label="Primary navigation">
           {NAV_ITEMS.map((item) => {

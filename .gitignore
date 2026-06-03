@@ -11,10 +11,20 @@ frontend/node_modules/
 frontend/.env.local
 frontend/tsconfig.tsbuildinfo
 
+plans/
+Plans[ ]/
+
 data/*
 !data/raw/
 !data/raw/html/
 !data/raw/pdfs/
 !data/processed/
 !data/exports/
-!data/**/.gitkeep
+data/raw/html/*
+data/raw/pdfs/*
+data/processed/*
+data/exports/*
+!data/raw/html/.gitkeep
+!data/raw/pdfs/.gitkeep
+!data/processed/.gitkeep
+!data/exports/.gitkeep

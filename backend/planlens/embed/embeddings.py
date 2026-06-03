@@ -85,7 +85,8 @@ class SentenceTransformersEmbeddingProvider:
         except ImportError as exc:
             raise RuntimeError(
                 "sentence-transformers is not installed. Use "
-                "PLANLENS_EMBEDDING_PROVIDER=local_hash, or install the optional local model stack."
+                "SF_PUBLIC_RECORD_EMBEDDING_PROVIDER=local_hash, "
+                "or install the optional local model stack."
             ) from exc
 
         if self._model is None:
@@ -296,7 +297,10 @@ def embedding_provider_from_settings(settings: Settings) -> EmbeddingProvider:
         )
     if provider_name == "openai":
         if not settings.openai_api_key:
-            raise RuntimeError("OPENAI_API_KEY is required for PLANLENS_EMBEDDING_PROVIDER=openai.")
+            raise RuntimeError(
+                "OPENAI_API_KEY is required for "
+                "SF_PUBLIC_RECORD_EMBEDDING_PROVIDER=openai."
+            )
         return OpenAIEmbeddingProvider(
             api_key=settings.openai_api_key,
             model_name=settings.embedding_model,
@@ -304,7 +308,10 @@ def embedding_provider_from_settings(settings: Settings) -> EmbeddingProvider:
         )
     if provider_name in {"google", "gemini"}:
         if not settings.google_api_key:
-            raise RuntimeError("GOOGLE_API_KEY is required for PLANLENS_EMBEDDING_PROVIDER=google.")
+            raise RuntimeError(
+                "GOOGLE_API_KEY is required for "
+                "SF_PUBLIC_RECORD_EMBEDDING_PROVIDER=google."
+            )
         return GoogleEmbeddingProvider(
             api_key=settings.google_api_key,
             model_name=settings.embedding_model,

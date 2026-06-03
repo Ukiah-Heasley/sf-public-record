@@ -3,8 +3,8 @@ import "./globals.css";
 import { AppShell } from "../components/AppShell";
 
 export const metadata: Metadata = {
-  title: "PlanLens SF",
-  description: "Local civic document intelligence for SF Planning materials"
+  title: "SF Public Record",
+  description: "AI-assisted accountability for San Francisco planning records"
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

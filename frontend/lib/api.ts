@@ -7,7 +7,9 @@ import type {
 } from "./types";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_PLANLENS_API_BASE_URL ?? "http://127.0.0.1:8000";
+  process.env.NEXT_PUBLIC_SF_PUBLIC_RECORD_API_BASE_URL ??
+  process.env.NEXT_PUBLIC_PLANLENS_API_BASE_URL ??
+  "http://127.0.0.1:8000";
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {

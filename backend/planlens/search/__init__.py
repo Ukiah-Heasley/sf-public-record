@@ -1,1 +1,1 @@
-"""Search helpers for PlanLens evidence retrieval."""
+"""Search helpers for SF Public Record evidence retrieval."""

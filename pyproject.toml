@@ -1,7 +1,7 @@
 [project]
-name = "planlens-sf"
+name = "sf-public-record"
 version = "0.1.0"
-description = "Local-first civic document intelligence for SF Planning Commission materials."
+description = "AI-assisted accountability for San Francisco planning records."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -15,6 +15,7 @@ dependencies = [
 ]
 
 [project.scripts]
+sf-public-record = "backend.planlens.cli:app"
 planlens = "backend.planlens.cli:app"
 
 [dependency-groups]

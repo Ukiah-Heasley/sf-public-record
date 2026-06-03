@@ -1,1 +1,1 @@
-"""Embedding adapters for PlanLens chunks."""
+"""Embedding adapters for SF Public Record chunks."""

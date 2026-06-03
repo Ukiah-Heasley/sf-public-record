@@ -15,8 +15,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     init_db(app_settings.db_path)
 
     app = FastAPI(
-        title="PlanLens SF API",
-        description="Local-first civic document intelligence for SF Planning materials.",
+        title="SF Public Record API",
+        description="AI-assisted accountability for San Francisco planning records.",
         version="0.1.0",
     )
     app.state.settings = app_settings
